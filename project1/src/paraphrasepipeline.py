@@ -6,6 +6,7 @@ from src.paraphraseclassifier import ParaphraseClassifier
 
 
 def make_features(s1: csr_matrix, s2: csr_matrix):
+    """Simple baseline: just stack the feature vectors"""
     if type(s1) != type(s2):
         msg = f"Type mismatch: {type(s1)}, {type(s2)}"
         raise ValueError(msg)

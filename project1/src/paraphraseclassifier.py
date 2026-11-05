@@ -17,7 +17,7 @@ class ParaphraseClassifier(ABC):
         """Make predictions."""
 
 
-class LogLinear(ParaphraseClassifier):
+class LogReg(ParaphraseClassifier):
     def __init__(self, solver: str) -> None:
         super().__init__()
         self.model = LogisticRegression(solver=solver)

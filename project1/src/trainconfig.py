@@ -20,5 +20,5 @@ class TrainConfig:
 def parse_config() -> TrainConfig:
     parser = ArgumentParser()
     parser.add_argument("--encoder", choices=["indicator", "bow", "sentencetransformer"], required=True)
-    parser.add_argument("--model", choices=["loglinear", "shallowmlp", "deepmlp"], required=True)
+    parser.add_argument("--model", choices=["logreg", "shallowmlp", "deepmlp"], required=True)
     return TrainConfig(**vars(parser.parse_args()))
