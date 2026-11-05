@@ -1,25 +1,22 @@
-from argparse import ArgumentParser, Namespace
-
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
 from src.encoder import (
     BagOfWordsEncoder,
     Encoder,
     SentenceTransformerEncoder,
     TokenIndicatorEncoder,
 )
+from src.paraphraseclassifier import (
+    DeepMLP,
+    LogLinear,
+    ParaphraseClassifier,
+    ShallowMLP,
+)
+from src.paraphrasepipeline import ParaphrasePipeline
+from src.trainconfig import TrainConfig, parse_config
 from src.utils import load_datasets
 
 
-def parse_args() -> Namespace:
-    parser = ArgumentParser()
-    parser.add_argument(
-        "--encoder", type=str, choices=["indicator", "bow", "sentencetransformer"], required=True)
-    parser.add_argument("--model", type=str, choices=["loglin", "shallowmlp", "deepmlp"], required=True)
-    return parser.parse_args()
-
-
-def make_encoder(config: Namespace) -> Encoder:
+def make_encoder(config: TrainConfig) -> Encoder:
     """Build an encoder."""
     match config.encoder:
         case "indicator":
@@ -34,32 +31,39 @@ def make_encoder(config: Namespace) -> Encoder:
             raise ValueError(msg)
 
 
-def make_model(config: Namespace):
+def make_model(config: TrainConfig) -> ParaphraseClassifier:
     """Build a model."""
     match config.model:
-        case "loglin":
-            return LogisticRegression()
+        case "loglinear":
+            return LogLinear(config.loglinear_solver)
         case "shallowmlp":
-            raise NotImplementedError
+            return ShallowMLP()
         case "deepmlp":
-            raise NotImplementedError
+            return DeepMLP()
         case _:
             msg = f"Unknown model: {config.model}"
             raise ValueError(msg)
 
-def train_model(model, encoder: Encoder, train_df: pd.DataFrame) -> None:
-    encoder.fit(train_df["sentence1"], train_df["sentence2"])
-    s1 = encoder.transform(train_df["sentence1"])
-    s2 = encoder.transform(train_df["sentence2"])
-    # model.fit()
 
+def train_model(pipeline: ParaphrasePipeline, train_df: pd.DataFrame, dev_df: pd.DataFrame) -> None:
+    pipeline.fit(train_df)
+
+    dev_pred = pipeline.predict(dev_df)
+
+    print((dev_pred == dev_df["label"]).mean())
 
 def main() -> None:
-    config = parse_args()
+    config = parse_config()
     train_df, dev_df, test_df = load_datasets()
+
+    train_df = train_df.sample(400)
+    dev_df = dev_df.sample(400)
+
     encoder = make_encoder(config)
     model = make_model(config)
-    train_model(model, encoder, train_df)
+    pipeline = ParaphrasePipeline(encoder, model)
+
+    train_model(pipeline, train_df, dev_df)
 
 
 if __name__ == "__main__":
