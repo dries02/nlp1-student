@@ -21,7 +21,7 @@ class _CountEncoder(Encoder):
     """Implements encoders that use counting."""
     def __init__(self, **kwargs) -> None:
         super().__init__()
-        self.encoder = CountVectorizer(**kwargs)
+        self.encoder = CountVectorizer(min_df=2, max_features=5000, **kwargs)
 
     @override
     def fit(self, s1: pd.Series, s2: pd.Series) -> None:

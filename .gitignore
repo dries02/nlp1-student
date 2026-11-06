@@ -1,2 +1,4 @@
 *__pycache__
 .venv
+project1/embeddings/
+*.npy

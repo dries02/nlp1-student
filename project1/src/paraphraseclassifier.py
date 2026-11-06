@@ -40,7 +40,7 @@ class MLPClassifier(ParaphraseClassifier):
 
     @override
     def fit(self, X_train, y_train) -> None:
-        self.model.fit(X_train, y_train, epochs=self.n_epochs)
+        self.model.fit(X_train, y_train, epochs=self.n_epochs, batch_size=512)
 
     @override
     def predict(self, X) -> npt.NDArray:
