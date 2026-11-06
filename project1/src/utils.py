@@ -44,15 +44,22 @@ def make_encoder(config: TrainConfig) -> Encoder:
             raise ValueError(msg)
 
 
-def make_model(config: TrainConfig) -> ParaphraseClassifier:
-    """Build a model."""
+def make_model(config: TrainConfig, params: dict | None = None) -> ParaphraseClassifier:
+    """Build a model w optional hyperparameters."""
+    params = params or {}
+
     match config.model:
         case "logreg":
-            return LogReg(config.loglinear_solver)
+            model = LogReg(config.loglinear_solver)
+            model.model.set_params(**params)
+            return model
+
         case "shallowmlp":
-            return ShallowMLP()
+            return ShallowMLP(**params)
+
         case "deepmlp":
-            return DeepMLP()
+            return DeepMLP(**params)
+
         case _:
             msg = f"Unknown model: {config.model}"
             raise ValueError(msg)
