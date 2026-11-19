@@ -4,3 +4,4 @@ project1/embeddings/
 *.npy
 *.txt
 *.zip
+*.gz
