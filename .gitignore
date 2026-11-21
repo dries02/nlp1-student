@@ -5,3 +5,5 @@ project1/embeddings/
 *.txt
 *.zip
 *.gz
+.ipynb_checkpoints/
+*_robin.ipynb
